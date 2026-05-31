@@ -28,11 +28,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install PyQt6 PyQt6-WebEngine pyinstaller
 
-       # Windows 打包命令
       - name: Build with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller --noconsole --onefile --name "HeyGenControl_v1.0_Win" `
+          pyinstaller --noconsole --onefile --name "HeyGenControl_Win" `
           --icon "heygen-logo.ico" `
           --add-data "styles.py;." `
           --add-data "browser.py;." `
@@ -42,11 +41,10 @@ jobs:
           --collect-all PyQt6.QtWebEngineWidgets `
           main.py
 
-      # Linux 打包命令
       - name: Build with PyInstaller (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          pyinstaller --noconsole --onefile --name "HeyGenControl_v1.0_Linux" \
+          pyinstaller --noconsole --onefile --name "HeyGenControl_Linux" \
           --add-data "styles.py:." \
           --add-data "browser.py:." \
           --add-data "ui_components.py:." \
@@ -54,13 +52,12 @@ jobs:
           --collect-all PyQt6.QtWebEngineCore \
           --collect-all PyQt6.QtWebEngineWidgets \
           main.py
-          # 给予可执行权限
-          chmod +x dist/HeyGenControl_v1.0_Linux
+          chmod +x dist/HeyGenControl_Linux
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts-${{ matrix.os }}
+          name: build-${{ matrix.os }}
           path: dist/
 
   release:
@@ -72,16 +69,18 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: all-builds
-          pattern: build-artifacts-*
-          merge-multiple: true
+          path: ./all-builds
+          pattern: build-*
+          merge-multiple: true # 关键：将所有平台的产物合并到同一个文件夹
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          # 使用通配符自动抓取合并文件夹下的所有打包文件
           files: |
-            all-builds/HeyGenControl_v1.0_Win.exe
-            all-builds/HeyGenControl_v1.0_Linux
+            all-builds/HeyGenControl_Win.exe
+            all-builds/HeyGenControl_Linux
             HeyGenControl.desktop
+            heygen-logo.ico
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
