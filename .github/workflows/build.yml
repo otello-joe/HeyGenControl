@@ -3,23 +3,23 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*' # 当你推送 v1.0, v1.1 等标签时触发
+      - 'v*'
 
 jobs:
   build:
     name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false # 即使一个平台失败，另一个平台也继续打包
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest]
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # 升级到 v4
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5 # 升级到 v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -31,7 +31,7 @@ jobs:
       - name: Build with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller --noconsole --name "HeyGenControl_v1.0_Win" `
+          pyinstaller --noconsole --onefile --name "HeyGenControl_v1.0_Win" `
           --add-data "styles.py;." `
           --add-data "browser.py;." `
           --add-data "ui_components.py;." `
@@ -42,7 +42,7 @@ jobs:
       - name: Build with PyInstaller (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          pyinstaller --noconsole --name "HeyGenControl_v1.0_Linux" \
+          pyinstaller --noconsole --onefile --name "HeyGenControl_v1.0_Linux" \
           --add-data "styles.py:." \
           --add-data "browser.py:." \
           --add-data "ui_components.py:." \
@@ -51,27 +51,28 @@ jobs:
           main.py
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4 # 【核心修复：升级到 v4】
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ matrix.os }}
-          path: dist/
+          path: dist/ # 这里会自动包含生成的单文件 exe 或 binary
 
   release:
     needs: build
     runs-on: ubuntu-latest
     permissions:
-      contents: write # 确保有权限创建 Release
+      contents: write
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v4 # 【核心修复：升级到 v4】
+        uses: actions/download-artifact@v4
         with:
           path: all-builds
           pattern: build-artifacts-*
           merge-multiple: true
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2 # 升级到 v2
+        uses: softprops/action-gh-release@v2
         with:
+          # 自动匹配 dist 目录下的单文件
           files: |
             all-builds/HeyGenControl_v1.0_Win.exe
             all-builds/HeyGenControl_v1.0_Linux
