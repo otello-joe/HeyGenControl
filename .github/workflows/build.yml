@@ -28,17 +28,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install PyQt6 PyQt6-WebEngine pyinstaller
 
+       # Windows 打包命令
       - name: Build with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           pyinstaller --noconsole --onefile --name "HeyGenControl_v1.0_Win" `
+          --icon "heygen-logo.ico" `
           --add-data "styles.py;." `
           --add-data "browser.py;." `
           --add-data "ui_components.py;." `
+          --add-data "heygen-logo.ico;." `
           --collect-all PyQt6.QtWebEngineCore `
           --collect-all PyQt6.QtWebEngineWidgets `
           main.py
 
+      # Linux 打包命令
       - name: Build with PyInstaller (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -46,15 +50,18 @@ jobs:
           --add-data "styles.py:." \
           --add-data "browser.py:." \
           --add-data "ui_components.py:." \
+          --add-data "heygen-logo.ico:." \
           --collect-all PyQt6.QtWebEngineCore \
           --collect-all PyQt6.QtWebEngineWidgets \
           main.py
+          # 给予可执行权限
+          chmod +x dist/HeyGenControl_v1.0_Linux
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ matrix.os }}
-          path: dist/ # 这里会自动包含生成的单文件 exe 或 binary
+          path: dist/
 
   release:
     needs: build
@@ -72,9 +79,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          # 自动匹配 dist 目录下的单文件
           files: |
             all-builds/HeyGenControl_v1.0_Win.exe
             all-builds/HeyGenControl_v1.0_Linux
+            HeyGenControl.desktop
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

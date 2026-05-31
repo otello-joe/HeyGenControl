@@ -27,12 +27,22 @@ from PyQt6.QtGui import QFont
 from styles import STYLE_SHEET
 from browser import BrowserInstance
 from ui_components import LeftSidebar, TopBar
+from PyQt6.QtGui import QFont, QIcon # 增加 QIcon
+
+def resource_path(relative_path):
+    """ 获取资源的绝对路径，兼容开发环境和 PyInstaller 打包后的路径 """
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HeyGen 群控自动化 v1.0 (Stable-Pro)")
+        self.setWindowTitle("HeyGen 群控自动化 v1.0")
         self.setStyleSheet(STYLE_SHEET)
+
+        # 【核心修改】：设置窗口图标
+        self.setWindowIcon(QIcon(resource_path("heygen-logo.ico")))
 
         # 跨平台路径识别
         if sys.platform == "win32":

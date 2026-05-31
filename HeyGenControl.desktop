@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=HeyGen Control
+Comment=HeyGen & Canva Automation Tool
+Exec=/home/lh/bin/HeyGenControl_v1.0_Linux
+# 修改为您的图标文件名
+Icon=/home/lh/bin/heygen-logo.ico
+Terminal=false
+Type=Application
+Categories=Network;Automation;
