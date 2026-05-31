@@ -1,8 +1,0 @@
-__pycache__/
-*.pyc
-browser_data/
-browser_profiles/
-dist/
-build/
-*.spec
-HeyGenControl*

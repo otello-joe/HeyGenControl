@@ -31,7 +31,8 @@ jobs:
       - name: Build with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller --noconsole --onefile --name "HeyGenControl_Win" `
+          # 核心修改：去掉了 --onefile，改用默认的目录模式
+          pyinstaller --noconsole --name "HeyGenControl_Win" `
           --icon "heygen-logo.ico" `
           --add-data "styles.py;." `
           --add-data "browser.py;." `
@@ -44,7 +45,7 @@ jobs:
       - name: Build with PyInstaller (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          pyinstaller --noconsole --onefile --name "HeyGenControl_Linux" \
+          pyinstaller --noconsole --name "HeyGenControl_Linux" \
           --add-data "styles.py:." \
           --add-data "browser.py:." \
           --add-data "ui_components.py:." \
@@ -52,13 +53,21 @@ jobs:
           --collect-all PyQt6.QtWebEngineCore \
           --collect-all PyQt6.QtWebEngineWidgets \
           main.py
-          chmod +x dist/HeyGenControl_Linux
+
+      # 将生成的文件夹压缩，方便下载
+      - name: Zip Build (Windows)
+        if: matrix.os == 'windows-latest'
+        run: Compress-Archive -Path dist/HeyGenControl_Win -DestinationPath dist/HeyGenControl_Win.zip
+
+      - name: Zip Build (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: zip -r dist/HeyGenControl_Linux.zip dist/HeyGenControl_Linux
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.os }}
-          path: dist/
+          path: dist/*.zip
 
   release:
     needs: build
@@ -71,15 +80,14 @@ jobs:
         with:
           path: ./all-builds
           pattern: build-*
-          merge-multiple: true # 关键：将所有平台的产物合并到同一个文件夹
+          merge-multiple: true
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          # 使用通配符自动抓取合并文件夹下的所有打包文件
           files: |
-            all-builds/HeyGenControl_Win.exe
-            all-builds/HeyGenControl_Linux
+            all-builds/HeyGenControl_Win.zip
+            all-builds/HeyGenControl_Linux.zip
             HeyGenControl.desktop
             heygen-logo.ico
         env:
