@@ -10,7 +10,9 @@ class LeftSidebar(QFrame):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(5, 15, 5, 10); layout.setSpacing(5)
 
-        title = QLabel("HeyGen 群控"); title.setAlignment(Qt.AlignmentFlag.AlignCenter); layout.addWidget(title)
+        # 修改版本号为 v1.0
+        title = QLabel("HeyGen 群控 v1.0")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter); layout.addWidget(title)
 
         self.btn_canva = QPushButton("🎨 公共 Canva 母本"); self.btn_canva.setObjectName("CanvaBtn")
         self.btn_canva.clicked.connect(canva_cb); layout.addWidget(self.btn_canva)
@@ -37,11 +39,8 @@ class TopBar(QFrame):
 
         self.url_input = QLineEdit("https://app.heygen.com/login"); self.url_input.setObjectName("UrlInput")
         self.url_input.returnPressed.connect(lambda: jump_cb(self.url_input.text()))
-
-        # 修正：确保在这里正确创建变量并赋值
         self.btn_jump = QPushButton("跳转"); self.btn_jump.setObjectName("JumpBtn")
         self.btn_jump.clicked.connect(lambda: jump_cb(self.url_input.text()))
-
         self.btn_refresh = QPushButton("刷新"); self.btn_refresh.setObjectName("RefreshBtn")
         self.btn_refresh.clicked.connect(refresh_cb)
 

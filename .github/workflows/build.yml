@@ -1,0 +1,73 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*' # 当你推送以 v 开头的标签（如 v1.0）时触发
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest] # 同时生成 Windows 和 Linux 版本
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build with PyInstaller (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          pyinstaller --noconsole --name "HeyGenControl_v1.0_Win" `
+          --add-data "styles.py;." `
+          --add-data "browser.py;." `
+          --add-data "ui_components.py;." `
+          --collect-all PyQt6.QtWebEngineCore `
+          --collect-all PyQt6.QtWebEngineWidgets `
+          main.py
+
+      - name: Build with PyInstaller (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          pyinstaller --noconsole --name "HeyGenControl_v1.0_Linux" \
+          --add-data "styles.py:." \
+          --add-data "browser.py:." \
+          --add-data "ui_components.py:." \
+          --collect-all PyQt6.QtWebEngineCore \
+          --collect-all PyQt6.QtWebEngineWidgets \
+          main.py
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}-build
+          path: dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            windows-latest-build/HeyGenControl_v1.0_Win.exe
+            ubuntu-latest-build/HeyGenControl_v1.0_Linux
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
