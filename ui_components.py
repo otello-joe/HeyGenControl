@@ -10,12 +10,11 @@ class LeftSidebar(QFrame):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(5, 15, 5, 10); layout.setSpacing(5)
 
-        # 修改版本号为 v1.0
         title = QLabel("HeyGen 群控 v1.0")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter); layout.addWidget(title)
 
-        self.btn_canva = QPushButton("🎨 公共 Canva 母本"); self.btn_canva.setObjectName("CanvaBtn")
-        self.btn_canva.clicked.connect(canva_cb); layout.addWidget(self.btn_canva)
+        self.btn_canva_root = QPushButton("🎨 公共 Canva 母本"); self.btn_canva_root.setObjectName("CanvaBtn")
+        self.btn_canva_root.clicked.connect(canva_cb); layout.addWidget(self.btn_canva_root)
 
         btn_grid = QVBoxLayout(); h1 = QHBoxLayout()
         self.btn_add = QPushButton("+添加"); self.btn_add.setObjectName("AddAccBtn"); self.btn_add.clicked.connect(add_cb)
@@ -32,7 +31,8 @@ class LeftSidebar(QFrame):
         layout.addWidget(self.account_list)
 
 class TopBar(QFrame):
-    def __init__(self, jump_cb, refresh_cb, zoom_cb, heygen_home_cb, sync_canva_cb):
+    # 增加了一个 clear_canva_cb 回调
+    def __init__(self, jump_cb, refresh_cb, zoom_cb, heygen_home_cb, sync_canva_cb, clear_canva_cb):
         super().__init__()
         self.setObjectName("TopBar")
         layout = QHBoxLayout(self); layout.setContentsMargins(10, 0, 10, 0); layout.setSpacing(8)
@@ -44,10 +44,14 @@ class TopBar(QFrame):
         self.btn_refresh = QPushButton("刷新"); self.btn_refresh.setObjectName("RefreshBtn")
         self.btn_refresh.clicked.connect(refresh_cb)
 
+        # 导航按钮组
         self.btn_heygen = QPushButton("🏠 HeyGen 首页"); self.btn_heygen.setObjectName("TopActionBtnBlue"); self.btn_heygen.clicked.connect(heygen_home_cb)
         self.btn_sync = QPushButton("🎨 同步至 Canva"); self.btn_sync.setObjectName("TopActionBtnPurple"); self.btn_sync.clicked.connect(sync_canva_cb)
+
+        # 【新增】：重置 Canva 按钮
+        self.btn_clear_canva = QPushButton("🗑️ 重置 Canva"); self.btn_clear_canva.setObjectName("TopActionBtnRed"); self.btn_clear_canva.clicked.connect(clear_canva_cb)
 
         self.zoom_spin = QDoubleSpinBox(); self.zoom_spin.setRange(0.1, 2.0); self.zoom_spin.setValue(0.75); self.zoom_spin.setObjectName("ZoomSpin"); self.zoom_spin.valueChanged.connect(zoom_cb)
 
         layout.addWidget(self.url_input, stretch=1); layout.addWidget(self.btn_jump); layout.addWidget(self.btn_refresh)
-        layout.addWidget(self.btn_heygen); layout.addWidget(self.btn_sync); layout.addWidget(self.zoom_spin)
+        layout.addWidget(self.btn_heygen); layout.addWidget(self.btn_sync); layout.addWidget(self.btn_clear_canva); layout.addWidget(self.zoom_spin)

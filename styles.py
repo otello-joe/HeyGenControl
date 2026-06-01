@@ -30,7 +30,20 @@ QMainWindow { background-color: #f0f2f5; }
     padding: 8px;
     border: none;
 }
+#TopActionBtnBlue { background-color: #3498db; color: white; font-weight: bold; border-radius: 4px; padding: 5px 12px; font-size: 11px; border: none; }
+#TopActionBtnBlue:hover { background-color: #2980b9; }
 
+#TopActionBtnPurple { background-color: #f0e6ff; color: #6b21a8; font-weight: bold; border-radius: 4px; padding: 5px 12px; font-size: 11px; border: 1px solid #d1b3ff; }
+#TopActionBtnPurple:hover { background-color: #d1b3ff; color: white; }
+
+/* 【新增】：重置按钮红色样式 */
+#TopActionBtnRed {
+    background-color: #ffeaa7; color: #d63031; font-weight: bold; border-radius: 4px;
+    padding: 5px 12px; font-size: 11px; border: 1px solid #fab1a0;
+}
+#TopActionBtnRed:hover { background-color: #ff7675; color: white; }
+
+#LogArea { background-color: #121212; color: #ecf0f1; font-family: 'Consolas'; font-size: 11px; padding: 5px; }
 QSplitter::handle { background-color: #d1d9e6; }
 """
 REAL_CHROME_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
